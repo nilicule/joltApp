@@ -42,6 +42,7 @@ Jolt is a lightweight macOS menu bar application that prevents your Mac from goi
 
 - **Enable/Disable**: Click on the "Enable Jolt" menu item to toggle sleep prevention.
 - **Timer**: Set a timer for sleep prevention using the "Set Timer" submenu.
+- **Start at Login**: Click on the "Start at Login" menu item to make Jolt start automatically when you log in to your Mac. A checkmark indicates when this feature is enabled.
 - **Quit**: Click on the "Quit" menu item to exit the application.
 
 ## Icon Implementation
