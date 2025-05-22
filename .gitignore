@@ -1,0 +1,4 @@
+releases/
+.idea/
+build/
+go.sum:
