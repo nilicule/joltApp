@@ -62,6 +62,7 @@ Jolt uses the macOS `caffeinate` command to prevent sleep, screen dimming, and s
 - `-d`: Prevent the display from sleeping
 - `-i`: Prevent the system from idle sleeping
 - `-s`: Prevent the system from sleeping
+- `-u`: Declare that the user is active (to prevent the screensaver from starting)
 
 ## License
 
