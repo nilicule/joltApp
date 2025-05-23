@@ -19,6 +19,10 @@ mkdir -p build/Jolt.app/Contents/{MacOS,Resources}
 # Copy the executable to the bundle
 cp build/Jolt build/Jolt.app/Contents/MacOS/
 
+# Copy the assets directory to the Resources directory
+mkdir -p build/Jolt.app/Contents/Resources/assets
+cp -R assets/* build/Jolt.app/Contents/Resources/assets/
+
 # Get version from version.txt file
 VERSION=$(cat version.txt)
 

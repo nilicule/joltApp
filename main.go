@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
 	"github.com/getlantern/systray"
@@ -25,7 +27,7 @@ func main() {
 func onReady() {
 	// Set up the menu bar icon
 	systray.SetIcon(getIcon("default"))
-	systray.SetTitle("Jolt")
+	systray.SetTitle("")
 	systray.SetTooltip("Jolt - Prevent your Mac from sleeping")
 
 	// Check if auto-start is enabled
@@ -111,15 +113,10 @@ func onReady() {
 				minutes := int(remaining.Minutes()) % 60
 				seconds := int(remaining.Seconds()) % 60
 
-				prefix := "Jolt"
-				if isSleepPrevented {
-					prefix = "⚡️ Jolt"
-				}
-
 				if hours > 0 {
-					systray.SetTitle(fmt.Sprintf("%s (%d:%02d:%02d)", prefix, hours, minutes, seconds))
+					systray.SetTitle(fmt.Sprintf("%d:%02d:%02d", hours, minutes, seconds))
 				} else {
-					systray.SetTitle(fmt.Sprintf("%s (%d:%02d)", prefix, minutes, seconds))
+					systray.SetTitle(fmt.Sprintf("%d:%02d", minutes, seconds))
 				}
 			}
 		}
@@ -151,7 +148,8 @@ func enableSleepPrevention() {
 	}
 
 	isSleepPrevented = true
-	systray.SetTitle("⚡️ Jolt")
+	systray.SetIcon(getIcon("active"))
+	systray.SetTitle("")
 	systray.SetTooltip("Jolt - Sleep Prevention Active")
 }
 
@@ -163,7 +161,8 @@ func disableSleepPrevention() {
 
 	isSleepPrevented = false
 	timerActive = false
-	systray.SetTitle("Jolt")
+	systray.SetIcon(getIcon("default"))
+	systray.SetTitle("")
 	systray.SetTooltip("Jolt - Prevent your Mac from sleeping")
 }
 
@@ -179,11 +178,7 @@ func setTimer(duration time.Duration) {
 
 func cancelTimer() {
 	timerActive = false
-	if isSleepPrevented {
-		systray.SetTitle("⚡️ Jolt")
-	} else {
-		systray.SetTitle("Jolt")
-	}
+	systray.SetTitle("")
 }
 
 func updateMenuItems(mToggle, mCancelTimer, mAutoStart *systray.MenuItem) {
@@ -225,11 +220,55 @@ func showNotification(title, message string) {
 	}
 }
 
-// getIcon returns a simple placeholder icon
-// We're using emoji characters in the title instead of custom icons
+// getIcon loads and returns the appropriate icon based on the state
 func getIcon(state string) []byte {
+	var iconName string
+
+	// Determine which icon to load based on the state
+	if state == "active" {
+		iconName = "icon_active.png"
+	} else {
+		iconName = "icon_default.png"
+	}
+
+	// List of possible icon locations (in order of preference)
+	iconPaths := []string{
+		fmt.Sprintf("assets/icons/%s", iconName),                                     // Development location
+		fmt.Sprintf("Contents/Resources/assets/icons/%s", iconName),                  // macOS app bundle location
+		fmt.Sprintf("%s/Contents/Resources/assets/icons/%s", getAppPath(), iconName), // Absolute path in app bundle
+	}
+
+	// Try each location until we find the icon
+	for _, iconPath := range iconPaths {
+		iconData, err := os.ReadFile(iconPath)
+		if err == nil {
+			return iconData
+		}
+	}
+
+	// If we couldn't find the icon, log an error and return a placeholder
+	fmt.Printf("Error loading icon %s: not found in any location\n", iconName)
 	// Return a simple placeholder icon (1x1 transparent pixel)
 	return []byte{0}
+}
+
+// getAppPath returns the path to the application bundle
+func getAppPath() string {
+	// Get the executable path
+	execPath, err := os.Executable()
+	if err != nil {
+		fmt.Println("Error getting executable path:", err)
+		return ""
+	}
+
+	// For a macOS app bundle, the executable is in Contents/MacOS/
+	// So we need to go up two directories to get the app bundle path
+	appPath := execPath
+	for i := 0; i < 2; i++ {
+		appPath = filepath.Dir(appPath)
+	}
+
+	return appPath
 }
 
 // isAutoStartEnabled checks if the app is set to start at login

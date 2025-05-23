@@ -47,12 +47,22 @@ Jolt is a lightweight macOS menu bar application that prevents your Mac from goi
 
 ## Icon Implementation
 
-Instead of using custom icon files, Jolt uses emoji characters directly in the menu bar title:
+Jolt supports custom icon files for the menu bar:
 
-- When sleep prevention is active: "⚡️ Jolt" (with lightning bolt emoji)
-- When sleep prevention is inactive: "Jolt" (without emoji)
+- When sleep prevention is active: Uses `icon_active.png` from the assets/icons directory
+- When sleep prevention is inactive: Uses `icon_default.png` from the assets/icons directory
 
-This approach simplifies the application and provides a clear visual indicator of the current state.
+Jolt now displays only the icon in the menu bar, without any text, providing a cleaner and more minimal interface.
+
+### Customizing Icons
+
+To use custom icons with Jolt:
+
+1. Create your icon files according to the specifications in the `assets/icons/README.md` file
+2. Place them in the `assets/icons` directory with the following names:
+   - `icon_default.png` - The default icon shown when sleep prevention is inactive
+   - `icon_active.png` - The icon shown when sleep prevention is active
+3. Rebuild the application using the build.sh script
 
 See the README in the `assets/icons` directory for more details on the implementation.
 
