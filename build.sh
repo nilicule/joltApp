@@ -23,6 +23,13 @@ cp build/Jolt build/Jolt.app/Contents/MacOS/
 mkdir -p build/Jolt.app/Contents/Resources/assets
 cp -R assets/* build/Jolt.app/Contents/Resources/assets/
 
+# Copy the default icon to be used as the application icon
+cp assets/icons/icon_default.png build/Jolt.app/Contents/Resources/AppIcon.png
+
+# Copy the menu bar icons directly to the Resources directory
+cp assets/icons/icon_default.png build/Jolt.app/Contents/Resources/
+cp assets/icons/icon_active.png build/Jolt.app/Contents/Resources/
+
 # Get version from version.txt file
 VERSION=$(cat version.txt)
 
@@ -52,6 +59,8 @@ cat > build/Jolt.app/Contents/Info.plist << EOF
     <string>10.13</string>
     <key>LSUIElement</key>
     <true/>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
 </dict>
 </plist>
 EOF

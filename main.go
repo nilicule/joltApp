@@ -231,25 +231,24 @@ func getIcon(state string) []byte {
 		iconName = "icon_default.png"
 	}
 
-	// List of possible icon locations (in order of preference)
-	iconPaths := []string{
-		fmt.Sprintf("assets/icons/%s", iconName),                                     // Development location
-		fmt.Sprintf("Contents/Resources/assets/icons/%s", iconName),                  // macOS app bundle location
-		fmt.Sprintf("%s/Contents/Resources/assets/icons/%s", getAppPath(), iconName), // Absolute path in app bundle
+	// Get the application path
+	appPath := getAppPath()
+	fmt.Printf("App path: %s\n", appPath)
+
+	// Correct icon location
+	iconPath := fmt.Sprintf("%s/Resources/assets/icons/%s", appPath, iconName)
+
+	// Try to load the icon
+	fmt.Printf("Trying to load icon from: %s\n", iconPath)
+	iconData, err := os.ReadFile(iconPath)
+	if err == nil {
+		fmt.Printf("Successfully loaded icon from: %s\n", iconPath)
+		return iconData
 	}
 
-	// Try each location until we find the icon
-	for _, iconPath := range iconPaths {
-		iconData, err := os.ReadFile(iconPath)
-		if err == nil {
-			return iconData
-		}
-	}
-
-	// If we couldn't find the icon, log an error and return a placeholder
-	fmt.Printf("Error loading icon %s: not found in any location\n", iconName)
-	// Return a simple placeholder icon (1x1 transparent pixel)
-	return []byte{0}
+	// Log error and return a placeholder if not found
+	fmt.Printf("Error loading icon %s: %v\n", iconName, err)
+	return []byte{0} // Placeholder (1x1 transparent pixel)
 }
 
 // getAppPath returns the path to the application bundle
@@ -262,13 +261,8 @@ func getAppPath() string {
 	}
 
 	// For a macOS app bundle, the executable is in Contents/MacOS/
-	// So we need to go up two directories to get the app bundle path
-	appPath := execPath
-	for i := 0; i < 2; i++ {
-		appPath = filepath.Dir(appPath)
-	}
-
-	return appPath
+	// Go up two directories to get the app bundle path
+	return filepath.Dir(filepath.Dir(execPath))
 }
 
 // isAutoStartEnabled checks if the app is set to start at login
